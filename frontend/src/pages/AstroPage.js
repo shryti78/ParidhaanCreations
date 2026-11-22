@@ -749,17 +749,110 @@ export default function AstroPage() {
             {panchangResult && (
               <div className="mt-6 animate-slide-up">
                 <DecorativeCard gradient="from-slate-900/50 to-emerald-900/30">
-                  {/* Date Header Card */}
+                  {/* Date header */}
                   <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 mb-6 text-center shadow-xl">
                     <div className="text-white text-3xl font-bold mb-1">{panchangResult.date}</div>
                     <div className="text-white/90 text-lg">{panchangResult.weekday}</div>
-                    <div className="text-[#D4AF37] text-xl font-semibold">{panchangResult.hindi_weekday}</div>
+                    <div className="text-[#D4AF37] text-xl font-semibold">{panchangResult.weekday_hindi}</div>
                     <div className="text-white/70 text-sm mt-2 flex items-center justify-center gap-2">
                       <MapPin className="w-4 h-4" /> {panchangResult.location}
                     </div>
                   </div>
-                  
-                  <FormatResponse text={panchangResult.panchang} />
+
+                  {/* Four core Panchang elements — Tithi, Nakshatra, Yoga, Karana */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {/* Tithi */}
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <div className="text-emerald-300 text-xs uppercase tracking-wider mb-1">तिथि · Tithi</div>
+                      <div className="text-white text-xl font-semibold">{panchangResult.tithi?.name}</div>
+                      <div className="text-[#D4AF37] text-sm">{panchangResult.tithi?.name_hindi}</div>
+                      <div className="text-gray-400 text-xs mt-1">
+                        {panchangResult.tithi?.paksha_hindi} · #{panchangResult.tithi?.number}
+                        {panchangResult.tithi?.progress_percent !== undefined && (
+                          <span className="ml-2">· {panchangResult.tithi.progress_percent}% elapsed</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Nakshatra */}
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <div className="text-emerald-300 text-xs uppercase tracking-wider mb-1">नक्षत्र · Nakshatra</div>
+                      <div className="text-white text-xl font-semibold">{panchangResult.nakshatra?.name}</div>
+                      <div className="text-[#D4AF37] text-sm">{panchangResult.nakshatra?.name_hindi}</div>
+                      <div className="text-gray-400 text-xs mt-1">
+                        Pada {panchangResult.nakshatra?.pada} · Lord: {panchangResult.nakshatra?.lord}
+                      </div>
+                    </div>
+
+                    {/* Yoga */}
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <div className="text-emerald-300 text-xs uppercase tracking-wider mb-1">योग · Yoga</div>
+                      <div className="text-white text-xl font-semibold">{panchangResult.yoga?.name}</div>
+                      <div className="text-[#D4AF37] text-sm">{panchangResult.yoga?.name_hindi}</div>
+                      <div className="text-gray-400 text-xs mt-1">#{panchangResult.yoga?.number} of 27</div>
+                    </div>
+
+                    {/* Karana */}
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <div className="text-emerald-300 text-xs uppercase tracking-wider mb-1">करण · Karana</div>
+                      <div className="text-white text-xl font-semibold">{panchangResult.karana?.name}</div>
+                      <div className="text-gray-400 text-xs mt-1">#{panchangResult.karana?.number} of 60</div>
+                    </div>
+                  </div>
+
+                  {/* Sunrise / Sunset */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 rounded-xl p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-amber-300 text-sm mb-1">
+                        <Sun className="w-4 h-4" /> Sunrise
+                      </div>
+                      <div className="text-white text-2xl font-bold">{panchangResult.sunrise}</div>
+                    </div>
+                    <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/30 rounded-xl p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-indigo-300 text-sm mb-1">
+                        <Moon className="w-4 h-4" /> Sunset
+                      </div>
+                      <div className="text-white text-2xl font-bold">{panchangResult.sunset}</div>
+                    </div>
+                  </div>
+
+                  {/* Muhurat / Kaal timings */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Abhijit Muhurat — most auspicious */}
+                    <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 rounded-xl p-4">
+                      <div className="text-emerald-300 text-xs uppercase tracking-wider mb-1">✨ Abhijit Muhurat</div>
+                      <div className="text-white text-lg font-semibold">
+                        {panchangResult.abhijit_muhurat?.start} – {panchangResult.abhijit_muhurat?.end}
+                      </div>
+                      <div className="text-gray-400 text-xs mt-1">Most auspicious time</div>
+                    </div>
+
+                    {/* Rahu Kaal — avoid */}
+                    <div className="bg-gradient-to-br from-red-500/20 to-rose-500/10 border border-red-500/30 rounded-xl p-4">
+                      <div className="text-red-300 text-xs uppercase tracking-wider mb-1">⚠️ Rahu Kaal</div>
+                      <div className="text-white text-lg font-semibold">
+                        {panchangResult.rahu_kaal?.start} – {panchangResult.rahu_kaal?.end}
+                      </div>
+                      <div className="text-gray-400 text-xs mt-1">Avoid new ventures</div>
+                    </div>
+
+                    {/* Gulika Kaal */}
+                    <div className="bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 rounded-xl p-4">
+                      <div className="text-orange-300 text-xs uppercase tracking-wider mb-1">⚠️ Gulika Kaal</div>
+                      <div className="text-white text-lg font-semibold">
+                        {panchangResult.gulika_kaal?.start} – {panchangResult.gulika_kaal?.end}
+                      </div>
+                      <div className="text-gray-400 text-xs mt-1">Inauspicious window</div>
+                    </div>
+                  </div>
+
+                  {/* Engine attribution */}
+                  <div className="mt-6 text-center text-xs text-gray-500">
+                    Calculated using {panchangResult.engine || 'Swiss Ephemeris'} ·
+                    {panchangResult.coordinates && (
+                      <> {panchangResult.coordinates.lat.toFixed(2)}°, {panchangResult.coordinates.lng.toFixed(2)}°</>
+                    )}
+                  </div>
                 </DecorativeCard>
               </div>
             )}

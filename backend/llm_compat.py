@@ -16,7 +16,7 @@ Required env vars (whichever provider you plan to use):
 Usage identical to Emergent's original:
 
     chat = LlmChat(api_key=key, session_id="abc", system_message="You are …")
-    chat = chat.with_model("openai", "gpt-4o-mini")   # or "gemini", "gemini-2.5-flash"
+    chat = chat.with_model("openai", "gpt-4o-mini")   # or "gemini", "gemini-3.8-flash"
     response = await chat.send_message(UserMessage(text="hello"))
 
 If no provider key is set, `send_message` raises an HTTPException(503)

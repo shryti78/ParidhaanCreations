@@ -232,7 +232,7 @@ Be specific and mathematical. Reference actual degrees and positions."""
         chat = LlmChat(
             session_id=f"kundli_{user['user_id']}_{cache_key[:8]}",
             system_message=get_personalized_prompt(profile)
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -305,7 +305,7 @@ Make it SPECIFIC to my chart, not generic!"""
         chat = LlmChat(
             session_id=f"daily_{user['user_id']}_{today}",
             system_message=get_personalized_prompt(profile)
-        ).with_model("gemini", "gemini-2.5-flash")  # FREE tier model
+        ).with_model("gemini", "gemini-3.8-flash")  # FREE tier model
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -353,7 +353,7 @@ Always mention the current year {date_info['year']} when giving predictions."""
         chat = LlmChat(
             session_id=session_id,
             system_message=get_personalized_prompt(profile)
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=full_prompt))
         
@@ -467,7 +467,7 @@ Remember: All predictions should be for {date_info['year']}, NOT any past year."
         chat = LlmChat(
             session_id=f"rashifal_{request.rashi_id}_{today}",
             system_message=get_rashifal_system_prompt()
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -506,7 +506,7 @@ Be specific and practical. Explain briefly why each is lucky for this rashi toda
         chat = LlmChat(
             session_id=f"lucky_{rashi_id}_{today}",
             system_message=RASHIFAL_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")  # FREE tier model
+        ).with_model("gemini", "gemini-3.8-flash")  # FREE tier model
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -651,7 +651,7 @@ Format beautifully without using ** or ### symbols. Use emojis and clear section
         chat = LlmChat(
             session_id=f"numerology_{request.name}_{today}",
             system_message=NUMEROLOGY_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -764,7 +764,7 @@ Make it deeply meaningful and connected to the person's life. Use Hinglish natur
         chat = LlmChat(
             session_id=f"tarot_{today}_{request.spread_type}",
             system_message=TAROT_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -879,7 +879,7 @@ Make it accurate and practical for daily use."""
         chat = LlmChat(
             session_id=f"panchang_{panchang_date}_{request.location[:10]}",
             system_message=PANCHANG_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -938,7 +938,7 @@ Make it specific to this person, not generic."""
         chat = LlmChat(
             session_id=f"my_numerology_{user['user_id']}",
             system_message=NUMEROLOGY_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         
@@ -992,7 +992,7 @@ Connect the reading to their birth chart and life path. Make it deeply personal.
         chat = LlmChat(
             session_id=f"my_tarot_{user['user_id']}_{today}",
             system_message=TAROT_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-3.8-flash")
         
         response = await chat.send_message(UserMessage(text=prompt))
         

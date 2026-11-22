@@ -65,7 +65,7 @@ Write a compelling description that will make customers want to buy this product
         chat = LlmChat(
             session_id=f"desc_{request.product_name[:20]}",
             system_message=DESCRIPTION_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-2.5-flash")  # FREE tier model
+        ).with_model("gemini", "gemini-3.8-flash")  # FREE tier model
         
         user_message = UserMessage(text=prompt)
         response = await chat.send_message(user_message)

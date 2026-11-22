@@ -810,88 +810,25 @@ class PanchangRequest(BaseModel):
 
 @router.post("/panchang")
 async def get_panchang(request: PanchangRequest):
-    """Get daily Panchang - PUBLIC"""
-    
-    if request.date:
-        panchang_date = request.date
-        display_date = datetime.strptime(request.date, "%Y-%m-%d").strftime("%d %B %Y")
-    else:
-        panchang_date = datetime.now().strftime("%Y-%m-%d")
-        display_date = datetime.now().strftime("%d %B %Y")
-    
-    weekday = datetime.strptime(panchang_date, "%Y-%m-%d").strftime("%A")
-    
-    # Hindi weekdays
-    hindi_weekdays = {
-        "Monday": "सोमवार", "Tuesday": "मंगलवार", "Wednesday": "बुधवार",
-        "Thursday": "गुरुवार", "Friday": "शुक्रवार", "Saturday": "शनिवार", "Sunday": "रविवार"
-    }
-    
-    prompt = f"""Provide accurate Panchang for:
+    """
+    Get daily Panchang — PUBLIC.
 
-Date: {display_date} ({weekday} / {hindi_weekdays.get(weekday, weekday)})
-Location: {request.location}
-
-Include the following with accurate timings:
-
-1. TITHI (तिथि)
-   - Current Tithi name
-   - Tithi timing (start and end)
-   - Paksha (Shukla/Krishna)
-
-2. NAKSHATRA (नक्षत्र)
-   - Current Nakshatra
-   - Nakshatra timing
-   - Nakshatra Lord
-
-3. YOGA (योग)
-   - Current Yoga name
-   - Yoga timing
-
-4. KARANA (करण)
-   - Current Karana
-   - Karana timing
-
-5. SUNRISE & SUNSET
-   - Exact timings for location
-
-6. RAHU KAAL (राहु काल)
-   - Exact timing to avoid
-
-7. GULIKA KAAL
-   - Timing
-
-8. ABHIJIT MUHURAT (शुभ मुहूर्त)
-   - Most auspicious time today
-
-9. AUSPICIOUS ACTIVITIES
-   - What is good to do today
-
-10. ACTIVITIES TO AVOID
-    - What should be avoided
-
-11. SPECIAL OBSERVANCES
-    - Any vrat, festival, or special day
-
-Make it accurate and practical for daily use."""
-
+    Real astronomical calculations via Swiss Ephemeris (pyswisseph).
+    Tithi, Nakshatra, Yoga, Karana derived from Sun/Moon longitudes at
+    local sunrise; Rahu Kaal / Gulika Kaal / Abhijit Muhurat from the
+    classical weekday-segment rules applied to the daylight window.
+    No LLM in the core numbers — they're deterministic math.
+    """
+    from panchang_service import compute_panchang
     try:
-        chat = LlmChat(
-            session_id=f"panchang_{panchang_date}_{request.location[:10]}",
-            system_message=PANCHANG_SYSTEM_PROMPT
-        ).with_model("gemini", "gemini-3.8-flash")
-        
-        response = await chat.send_message(UserMessage(text=prompt))
-        
-        return {
-            "date": display_date,
-            "weekday": weekday,
-            "hindi_weekday": hindi_weekdays.get(weekday, weekday),
-            "location": request.location,
-            "panchang": response
-        }
+        return compute_panchang(request.date, request.location)
+    except RuntimeError as e:
+        # pyswisseph not installed on this backend
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid input: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Panchang error: {e}")
 
 # ============ PERSONALIZED NUMEROLOGY & TAROT ============
 

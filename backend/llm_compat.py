@@ -14,7 +14,9 @@ Required env vars (whichever provider you plan to use):
   * ANTHROPIC_API_KEY
   * GROQ_API_KEY     (optional fallback — kicks in automatically when
                       the primary provider keeps returning 503 / overloaded.
-                      Model: llama-3.3-70b-versatile.)
+                      Model: openai/gpt-oss-120b, Groq's current large
+                      production model. `llama-3.3-70b-versatile` was
+                      deprecated by Groq on 2026-08-16.)
 
 Usage identical to Emergent's original:
 
@@ -23,7 +25,7 @@ Usage identical to Emergent's original:
     response = await chat.send_message(UserMessage(text="hello"))
 
 Automatic failover: if GROQ_API_KEY is set and the primary provider keeps
-failing with transient errors (after its own retries), Groq Llama 3.3 70B
+failing with transient errors (after its own retries), Groq GPT-OSS 120B
 is tried silently. The caller gets a successful response instead of a 503.
 
 If no provider key is set, `send_message` raises an HTTPException(503)
@@ -96,8 +98,13 @@ class LlmChat:
     # Fallback chain used when the primary provider keeps returning transient
     # failures. Order matters: first available key wins. Groq is cheap/free and
     # extremely fast, so it's the natural safety net.
+    #
+    # Model note: Groq deprecated `llama-3.3-70b-versatile` on 2026-08-16 and
+    # officially recommends `openai/gpt-oss-120b` as the migration target —
+    # OpenAI's open-weights 120B model, strong at multilingual (Hindi/English)
+    # content, still inside Groq's free tier.
     _FALLBACK_CHAIN = [
-        ("groq", "llama-3.3-70b-versatile"),
+        ("groq", "openai/gpt-oss-120b"),
     ]
 
     def _resolve_key(self, provider: Optional[str] = None) -> Optional[str]:

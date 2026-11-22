@@ -173,94 +173,55 @@ def get_cache_key(user_id: str, cache_type: str, profile: dict) -> str:
 
 @router.get("/my-kundli")
 async def get_my_kundli(user: dict = Depends(get_current_user), force_refresh: bool = False):
-    """Generate personalized Kundli based on birth details - cached for consistency"""
-    
+    """
+    Generate the user's Kundli from their saved birth details.
+
+    Uses real astronomical calculations via Swiss Ephemeris (Lahiri sidereal,
+    whole-sign Vedic houses). All positions are deterministic math — same
+    input → same chart, consistent with any traditional Jyotish source.
+
+    Cached on first compute; `?force_refresh=true` recomputes.
+    """
+    from kundli_service import compute_kundli
+
     profile = await db.astro_profiles.find_one({"user_id": user["user_id"]})
     if not profile:
         raise HTTPException(status_code=400, detail="Please save your birth details first")
-    
-    date_info = get_current_date_info()
+
     cache_key = get_cache_key(user["user_id"], "kundli", profile)
-    
-    # Check cache first (unless force refresh)
+
     if not force_refresh:
         cached = await db.astro_cache.find_one({"cache_key": cache_key, "type": "kundli"})
-        if cached:
-            return {
-                "profile": {
-                    "name": profile["name"],
-                    "dob": profile["date_of_birth"],
-                    "tob": profile["time_of_birth"],
-                    "pob": profile["place_of_birth"]
-                },
-                "kundli": cached["response"],
-                "cached": True
-            }
-    
-    prompt = f"""IMPORTANT: Today's date is {date_info['date_str']} and current year is {date_info['year']}.
-
-Based on my exact birth details:
-- Name: {profile['name']}
-- Date: {profile['date_of_birth']}
-- Time: {profile['time_of_birth']}
-- Place: {profile['place_of_birth']}
-
-Generate my complete Kundli analysis including:
-
-1. **Rashi (Moon Sign)** - Calculate my exact moon sign based on birth time and location
-2. **Lagna (Ascendant)** - Calculate rising sign at my birth time
-3. **Nakshatra** - My birth star and pada
-4. **Planetary Positions** - Where each planet was at my birth:
-   - Sun (सूर्य)
-   - Moon (चंद्र)
-   - Mars (मंगल)
-   - Mercury (बुध)
-   - Jupiter (बृहस्पति)
-   - Venus (शुक्र)
-   - Saturn (शनि)
-   - Rahu
-   - Ketu
-
-5. **Current Dasha in {date_info['year']}** - Which planetary period am I in RIGHT NOW?
-6. **Key Yogas** - Important yoga formations in my chart
-7. **Strengths & Challenges** - Based on planetary positions
-8. **Predictions for {date_info['year']}** - What does this year hold for me?
-
-Be specific and mathematical. Reference actual degrees and positions."""
+        if cached and isinstance(cached.get("response"), dict):
+            # Modern cached shape — structured kundli
+            return {**cached["response"], "cached": True}
 
     try:
-        chat = LlmChat(
-            session_id=f"kundli_{user['user_id']}_{cache_key[:8]}",
-            system_message=get_personalized_prompt(profile)
-        ).with_model("gemini", "gemini-3.8-flash")
-        
-        response = await chat.send_message(UserMessage(text=prompt))
-        
-        # Cache the response
-        await db.astro_cache.update_one(
-            {"cache_key": cache_key, "type": "kundli"},
-            {"$set": {
-                "cache_key": cache_key,
-                "type": "kundli",
-                "user_id": user["user_id"],
-                "response": response,
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }},
-            upsert=True
+        kundli = compute_kundli(
+            name=profile["name"],
+            date_of_birth=profile["date_of_birth"],
+            time_of_birth=profile.get("time_of_birth"),
+            place_of_birth=profile.get("place_of_birth", ""),
         )
-        
-        return {
-            "profile": {
-                "name": profile["name"],
-                "dob": profile["date_of_birth"],
-                "tob": profile["time_of_birth"],
-                "pob": profile["place_of_birth"]
-            },
-            "kundli": response,
-            "cached": False
-        }
+    except RuntimeError as e:
+        # pyswisseph missing on this backend
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Kundli calculation failed: {e}")
+
+    # Cache the full structured response
+    await db.astro_cache.update_one(
+        {"cache_key": cache_key, "type": "kundli"},
+        {"$set": {
+            "cache_key": cache_key,
+            "type": "kundli",
+            "user_id": user["user_id"],
+            "response": kundli,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+    return {**kundli, "cached": False}
 
 @router.get("/my-daily-prediction")
 async def get_daily_prediction(user: dict = Depends(get_current_user)):
@@ -640,7 +601,7 @@ Provide detailed interpretation for each number:
 5. Birthday {life_path_calc['day']} - Special gifts
 
 Also provide:
-- Personal Year Number for 2024
+- Personal Year Number for {datetime.now().year}
 - Lucky numbers for today
 - Compatibility numbers
 - Career guidance based on numbers

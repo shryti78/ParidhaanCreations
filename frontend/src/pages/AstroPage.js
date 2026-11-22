@@ -980,7 +980,112 @@ export default function AstroPage() {
                     </div>
                     {loading ? (
                       <LoadingSpinner text="Kundli generate ho rahi hai..." />
-                    ) : kundliData ? (
+                    ) : kundliData && kundliData.lagna ? (
+                      <div className="space-y-6">
+                        {/* Birth profile */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="text-amber-300 text-xs uppercase tracking-wider mb-2">Birth Details</div>
+                          <div className="text-white font-semibold">{kundliData.profile?.name}</div>
+                          <div className="text-gray-300 text-sm mt-1">
+                            📅 {kundliData.profile?.dob}
+                            {kundliData.profile?.tob && <> · ⏰ {kundliData.profile.tob}</>}
+                          </div>
+                          <div className="text-gray-300 text-sm">📍 {kundliData.profile?.pob}</div>
+                        </div>
+
+                        {/* Warnings if any */}
+                        {kundliData.warnings && kundliData.warnings.length > 0 && (
+                          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-amber-200 text-sm">
+                            ⚠️ {kundliData.warnings.join(' ')}
+                          </div>
+                        )}
+
+                        {/* 3 core identifiers: Lagna, Rashi, Janma Nakshatra */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 rounded-xl p-4">
+                            <div className="text-amber-300 text-xs uppercase tracking-wider mb-1">Lagna (Ascendant)</div>
+                            <div className="text-white text-xl font-bold">{kundliData.lagna.rashi}</div>
+                            <div className="text-[#D4AF37] text-sm">{kundliData.lagna.rashi_hindi}</div>
+                            <div className="text-gray-400 text-xs mt-1">
+                              Lord: {kundliData.lagna.rashi_lord} · Pada {kundliData.lagna.pada}
+                            </div>
+                          </div>
+                          <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/10 border border-blue-500/30 rounded-xl p-4">
+                            <div className="text-blue-300 text-xs uppercase tracking-wider mb-1">Rashi (Moon Sign)</div>
+                            <div className="text-white text-xl font-bold">{kundliData.rashi?.name}</div>
+                            <div className="text-[#D4AF37] text-sm">{kundliData.rashi?.name_hindi}</div>
+                            <div className="text-gray-400 text-xs mt-1">Lord: {kundliData.rashi?.lord}</div>
+                          </div>
+                          <div className="bg-gradient-to-br from-purple-500/20 to-fuchsia-500/10 border border-purple-500/30 rounded-xl p-4">
+                            <div className="text-purple-300 text-xs uppercase tracking-wider mb-1">Janma Nakshatra</div>
+                            <div className="text-white text-xl font-bold">{kundliData.janma_nakshatra?.name}</div>
+                            <div className="text-gray-400 text-xs mt-1">
+                              Lord: {kundliData.janma_nakshatra?.lord} · Pada {kundliData.janma_nakshatra?.pada}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 9 Grahas table */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                          <div className="px-4 py-3 bg-white/5 text-amber-300 text-xs uppercase tracking-wider">
+                            Nava Graha Positions (9 Planets)
+                          </div>
+                          <div className="divide-y divide-white/10">
+                            {(kundliData.planets || []).map((p) => (
+                              <div key={p.name} className="grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm">
+                                <div className="col-span-3 text-white font-semibold">
+                                  {p.name}
+                                  <span className="text-[#D4AF37] ml-2 text-xs">{p.name_hindi}</span>
+                                </div>
+                                <div className="col-span-3 text-gray-300">
+                                  {p.rashi} <span className="text-gray-500">({p.rashi_hindi})</span>
+                                </div>
+                                <div className="col-span-3 text-gray-300">
+                                  {p.nakshatra} <span className="text-gray-500">· P{p.pada}</span>
+                                </div>
+                                <div className="col-span-2 text-emerald-300 font-medium">
+                                  House {p.house}
+                                </div>
+                                <div className="col-span-1 text-gray-500 text-xs text-right">
+                                  {p.longitude}°
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Current Mahadasha */}
+                        <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 rounded-xl p-4">
+                          <div className="text-emerald-300 text-xs uppercase tracking-wider mb-2">
+                            Current Vimshottari Mahadasha
+                          </div>
+                          <div className="flex items-baseline gap-3 flex-wrap">
+                            <div className="text-white text-3xl font-bold">
+                              {kundliData.mahadasha_current?.lord}
+                            </div>
+                            <div className="text-gray-300 text-sm">
+                              {kundliData.mahadasha_current?.years_elapsed} of {kundliData.mahadasha_current?.total_years} years elapsed
+                            </div>
+                          </div>
+                          <div className="mt-2 text-gray-400 text-xs">
+                            Started: {kundliData.mahadasha_current?.started_approx}
+                            {' · '}
+                            Ends: {kundliData.mahadasha_current?.ends_approx}
+                            {' · '}
+                            {kundliData.mahadasha_current?.years_remaining} years remaining
+                          </div>
+                        </div>
+
+                        {/* Attribution */}
+                        <div className="text-center text-xs text-gray-500">
+                          {kundliData.engine || 'Swiss Ephemeris'}
+                          {kundliData.profile?.coordinates && (
+                            <> · {kundliData.profile.coordinates.lat.toFixed(2)}°, {kundliData.profile.coordinates.lng.toFixed(2)}°</>
+                          )}
+                        </div>
+                      </div>
+                    ) : kundliData && kundliData.kundli ? (
+                      // Back-compat: old cached text response — keep rendering
                       <FormatResponse text={kundliData.kundli} />
                     ) : (
                       <button onClick={fetchKundli} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-xl font-semibold">

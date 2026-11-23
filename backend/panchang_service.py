@@ -260,14 +260,16 @@ def _sunrise_sunset_jd(date: date_cls, lat: float, lng: float, tz_offset: float)
     """
     Returns (sunrise_jd_ut, sunset_jd_ut) for the given local date.
 
-    pyswisseph 2.10.x API for rise_trans is:
-        rise_trans(tjd_ut, body, rsmi, geopos, atpress=0, attemp=0, horhgt=0, flags=0)
-                                 ^^^^  ^^^^^^
-                              3rd arg  tuple(lng, lat, alt_m)
+    pyswisseph 2.10.x API for rise_trans takes 7 positional args:
+        rise_trans(tjd_start, body, rsmi, geopos, atpress=0, attemp=0, horhgt=0)
 
-    Returns (retflag, (jd,)). retflag < 0 means the body did not rise/set
-    in the search window (true polar regions only — never happens for any
-    realistic city that this app accepts as a location).
+    Notes:
+      - `rsmi` carries both the rise/set selector AND any flags, OR'd together
+        (e.g. CALC_RISE | BIT_HINDU_RISING). There is no separate `flags` arg.
+      - `geopos` is (longitude_east, latitude_north, altitude_m).
+      - Returns (retflag, (jd,)). retflag < 0 → body didn't rise/set in the
+        search window (true polar latitudes only; never happens for the cities
+        this app accepts).
     """
     # Start search a few hours before local midnight UT-equivalent so that
     # the local day's sunrise / sunset are both inside the search window.
@@ -276,12 +278,15 @@ def _sunrise_sunset_jd(date: date_cls, lat: float, lng: float, tz_offset: float)
 
     rise_flag = getattr(swe, "CALC_RISE", 1)
     set_flag = getattr(swe, "CALC_SET", 2)
-    geopos = (lng, lat, 0.0)  # (longitude_east, latitude_north, altitude_m)
+    geopos = (lng, lat, 0.0)
 
-    r_ret = swe.rise_trans(jd_start, swe.SUN, rise_flag, geopos, 0, 0, 0, 0)
-    s_ret = swe.rise_trans(jd_start, swe.SUN, set_flag, geopos, 0, 0, 0, 0)
+    # Only pass the 4 required args. atpress / attemp / horhgt all default to 0
+    # (standard atmosphere, sea-level horizon) which is what every mainstream
+    # Panchang implementation uses — refraction at these pressures changes
+    # sunrise/sunset by well under a minute.
+    r_ret = swe.rise_trans(jd_start, swe.SUN, rise_flag, geopos)
+    s_ret = swe.rise_trans(jd_start, swe.SUN, set_flag, geopos)
 
-    # pyswisseph 2.x returns (retflag, (jd,)). retflag==0 → success.
     r_flag, r_tup = r_ret[0], r_ret[1]
     s_flag, s_tup = s_ret[0], s_ret[1]
     if r_flag < 0 or s_flag < 0 or not r_tup or not s_tup:

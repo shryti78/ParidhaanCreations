@@ -781,15 +781,29 @@ async def get_panchang(request: PanchangRequest):
     No LLM in the core numbers — they're deterministic math.
     """
     from panchang_service import compute_panchang
+    import traceback
+    import logging as _logging
+    _log = _logging.getLogger("astro.panchang")
     try:
         return compute_panchang(request.date, request.location)
     except RuntimeError as e:
-        # pyswisseph not installed on this backend
+        # pyswisseph not installed OR astronomical event not found for extreme lat
+        _log.error("Panchang RuntimeError (date=%s, loc=%s): %s",
+                   request.date, request.location, e)
         raise HTTPException(status_code=503, detail=str(e))
     except ValueError as e:
+        _log.warning("Panchang bad input (date=%s, loc=%s): %s",
+                     request.date, request.location, e)
         raise HTTPException(status_code=400, detail=f"Invalid input: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Panchang error: {e}")
+        # Log the full traceback so Railway logs show where it blew up;
+        # user-facing message stays short.
+        _log.error("Panchang unexpected error (date=%s, loc=%s):\n%s",
+                   request.date, request.location, traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Panchang could not be computed: {type(e).__name__}",
+        )
 
 # ============ PERSONALIZED NUMEROLOGY & TAROT ============
 

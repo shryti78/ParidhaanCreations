@@ -257,22 +257,39 @@ def _sun_moon_longitudes(jd: float) -> tuple[float, float]:
 
 
 def _sunrise_sunset_jd(date: date_cls, lat: float, lng: float, tz_offset: float) -> tuple[float, float]:
-    """Returns (sunrise_jd_ut, sunset_jd_ut) for the given local date."""
-    # Start search a couple hours before local midnight UT-equivalent
-    local_midnight = datetime(date.year, date.month, date.day, 0, 0, 0)
-    jd_start = _julian_day(local_midnight, tz_offset)
+    """
+    Returns (sunrise_jd_ut, sunset_jd_ut) for the given local date.
 
-    # pyswisseph rise_trans: (jd_start, body, lng, lat, altitude, atpress, attemp, flags) → (retcode, (tret,))
+    pyswisseph 2.10.x API for rise_trans is:
+        rise_trans(tjd_ut, body, rsmi, geopos, atpress=0, attemp=0, horhgt=0, flags=0)
+                                 ^^^^  ^^^^^^
+                              3rd arg  tuple(lng, lat, alt_m)
+
+    Returns (retflag, (jd,)). retflag < 0 means the body did not rise/set
+    in the search window (true polar regions only — never happens for any
+    realistic city that this app accepts as a location).
+    """
+    # Start search a few hours before local midnight UT-equivalent so that
+    # the local day's sunrise / sunset are both inside the search window.
+    local_midnight = datetime(date.year, date.month, date.day, 0, 0, 0)
+    jd_start = _julian_day(local_midnight, tz_offset) - 0.25  # back off 6 hours
+
     rise_flag = getattr(swe, "CALC_RISE", 1)
     set_flag = getattr(swe, "CALC_SET", 2)
+    geopos = (lng, lat, 0.0)  # (longitude_east, latitude_north, altitude_m)
 
-    r_ret = swe.rise_trans(jd_start, swe.SUN, lng, lat, 0, 0, 0, rise_flag)
-    s_ret = swe.rise_trans(jd_start, swe.SUN, lng, lat, 0, 0, 0, set_flag)
+    r_ret = swe.rise_trans(jd_start, swe.SUN, rise_flag, geopos, 0, 0, 0, 0)
+    s_ret = swe.rise_trans(jd_start, swe.SUN, set_flag, geopos, 0, 0, 0, 0)
 
-    # In pyswisseph 2.x the result shape is (retflag, (jd,))
-    sunrise_jd = r_ret[1][0]
-    sunset_jd = s_ret[1][0]
-    return sunrise_jd, sunset_jd
+    # pyswisseph 2.x returns (retflag, (jd,)). retflag==0 → success.
+    r_flag, r_tup = r_ret[0], r_ret[1]
+    s_flag, s_tup = s_ret[0], s_ret[1]
+    if r_flag < 0 or s_flag < 0 or not r_tup or not s_tup:
+        raise RuntimeError(
+            f"Sun rise/set not found for {date.isoformat()} at "
+            f"({lat:.2f}, {lng:.2f}) — flags r={r_flag} s={s_flag}"
+        )
+    return r_tup[0], s_tup[0]
 
 
 # ============================================================================

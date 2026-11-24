@@ -91,8 +91,10 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Divine Greeting Bar - Scrolling Marquee */}
-      <div className="bg-gradient-to-r from-[#8B1538] via-[#D4AF37] to-[#8B1538] text-white py-1.5 text-sm overflow-hidden">
+      {/* Divine Greeting Bar - Scrolling Marquee.
+          Hidden on mobile — MobileHeader owns the viewport there; the
+          ticker just competes with search for precious vertical space. */}
+      <div className="hidden md:block bg-gradient-to-r from-[#8B1538] via-[#D4AF37] to-[#8B1538] text-white py-1.5 text-sm overflow-hidden">
         <div className="animate-marquee whitespace-nowrap inline-flex">
           {/* Repeat messages twice for seamless loop */}
           {[...tickerMessages, ...tickerMessages].map((msg, idx) => (
@@ -102,8 +104,9 @@ export default function Navbar() {
           ))}
         </div>
       </div>
-      
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200" role="navigation" aria-label="Main navigation">
+
+      {/* Desktop navbar. Hidden on mobile where MobileHeader takes over. */}
+      <nav className="hidden md:block sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200" role="navigation" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           <Link to="/" className="flex items-center" data-testid="logo-link" aria-label="Paridhaan Creations Home">

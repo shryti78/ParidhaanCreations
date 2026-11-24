@@ -45,6 +45,7 @@ const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 const ExitIntentPopup = lazy(() => import("@/components/ExitIntentPopup"));
 const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
+const MobileHeader = lazy(() => import("@/components/MobileHeader"));
 
 // Backend URL is always read from REACT_APP_BACKEND_URL. In the Emergent
 // deployment the frontend and backend shared an origin, so a fallback to
@@ -98,6 +99,14 @@ function AppRouter() {
       <DynamicFavicon />
       <BackgroundMusicPlayer />
       <Navbar />
+      {/* Mobile-only sticky header (maroon, logo + search + category chips).
+          The component is itself md:hidden so it just no-ops on desktop,
+          but we still skip mounting on admin to avoid loading cost. */}
+      {!location.pathname.startsWith('/admin') && (
+        <Suspense fallback={null}>
+          <MobileHeader />
+        </Suspense>
+      )}
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<HomePage />} />

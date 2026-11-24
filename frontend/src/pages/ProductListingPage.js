@@ -25,7 +25,9 @@ const categoryBanners = {
 export default function ProductListingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  // Seed from URL so a link like /products?search=laddu or ?category=pooja
+  // (used by MobileHeader search + chips) filters immediately on arrival.
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [maxPrice, setMaxPrice] = useState(10000);

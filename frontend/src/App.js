@@ -44,6 +44,7 @@ const AuthCallback = lazy(() => import("@/components/AuthCallback"));
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 const ExitIntentPopup = lazy(() => import("@/components/ExitIntentPopup"));
+const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
 
 // Backend URL is always read from REACT_APP_BACKEND_URL. In the Emergent
 // deployment the frontend and backend shared an origin, so a fallback to
@@ -86,9 +87,14 @@ function AppRouter() {
 
   // Hide WhatsApp button on admin pages
   const showWhatsApp = !location.pathname.startsWith('/admin');
+  // Mobile bottom nav — also hidden on admin and on the standalone checkout
+  // flow where a committed-purchase UI should own the viewport without
+  // distraction.
+  const showBottomNav = !location.pathname.startsWith('/admin') &&
+                        !location.pathname.startsWith('/checkout');
   
   return (
-    <div className="App">
+    <div className={`App ${showBottomNav ? "pb-20 md:pb-0" : ""}`}>
       <DynamicFavicon />
       <BackgroundMusicPlayer />
       <Navbar />
@@ -135,6 +141,14 @@ function AppRouter() {
       <Suspense fallback={null}>
         <ExitIntentPopup />
       </Suspense>
+      {/* Mobile-only bottom navigation (Flipkart-style). Hidden on md+ by
+          the component itself; App.js just skips rendering it on admin and
+          checkout where it would compete with the primary action. */}
+      {showBottomNav && (
+        <Suspense fallback={null}>
+          <MobileBottomNav />
+        </Suspense>
+      )}
       <Toaster position="top-right" />
     </div>
   );

@@ -33,6 +33,7 @@ module.exports = {
            brand language (Vrindavan, Barsana, Laddu Gopal). */
         primary: {
           DEFAULT: "#6E0F2C", /* was #0F4C75 — deep maroon anchors the brand */
+          dark: "#4a0a1d",    /* pressed/active state for primary surfaces */
           foreground: "#FFFFFF",
         },
         secondary: {

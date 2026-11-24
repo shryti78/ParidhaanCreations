@@ -95,11 +95,14 @@ export default function MobileHeader() {
 
   return (
     <header
-      className="md:hidden sticky top-0 z-40 bg-primary text-white shadow-sm"
+      className="md:hidden sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm"
       role="banner"
       aria-label="Mobile site header"
     >
-      {/* Row 1: logo + language + notifications */}
+      {/* Row 1: logo + language + notifications — on white so the Paridhaan
+          logo (whose artwork is maroon + orange on transparency) reads
+          cleanly. Earlier version used a solid maroon bar, which swallowed
+          the logo's own maroon strokes. */}
       <div className="flex items-center justify-between px-3 pt-2 pb-2">
         <Link to="/" aria-label="Paridhaan Creations home" className="flex items-center">
           <img
@@ -111,14 +114,13 @@ export default function MobileHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
-          {/* Compact language toggle designed for the maroon header. Shows
-              a flag + ISO code; tap to switch between EN and HI (handled by
-              the shared LanguageContext so it stays in sync everywhere). */}
+          {/* Compact language toggle. Flag + ISO code; tap to switch EN↔HI
+              (shared LanguageContext keeps it in sync with the desktop pill). */}
           <button
             type="button"
             onClick={toggleLanguage}
             aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
-            className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 transition-colors rounded-full px-2.5 py-1.5 text-xs font-semibold text-white"
+            className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full px-2.5 py-1.5 text-xs font-semibold text-primary"
             data-testid="mobile-header-language"
           >
             <span aria-hidden="true">{language === "en" ? "🇮🇳" : "🇬🇧"}</span>
@@ -128,13 +130,13 @@ export default function MobileHeader() {
           <Link
             to="/my-orders"
             aria-label={notifCount ? `${notifCount} new notifications` : "Notifications"}
-            className="relative w-9 h-9 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
+            className="relative w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors text-primary"
             data-testid="mobile-header-notifications"
           >
             <Bell className="w-4 h-4" aria-hidden="true" />
             {notifCount > 0 && (
               <span
-                className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary text-primary text-[10px] font-bold flex items-center justify-center border border-primary"
+                className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center border border-white"
                 aria-hidden="true"
               >
                 {notifCount > 9 ? "9+" : notifCount}
@@ -144,12 +146,13 @@ export default function MobileHeader() {
         </div>
       </div>
 
-      {/* Row 2: search */}
+      {/* Row 2: search — rounded-full for a true pill shape matching the
+          approved mockup. On a light cream field so the soft border shows. */}
       <form onSubmit={handleSearchSubmit} className="px-3 pb-2" role="search">
         <label htmlFor="mobile-search" className="sr-only">Search products</label>
         <div className="relative">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
             aria-hidden="true"
           />
           <input
@@ -160,15 +163,15 @@ export default function MobileHeader() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={'Search "Laddu Gopal dress"...'}
-            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white text-sm text-gray-800 placeholder:text-gray-400 border-none focus:outline-none focus:ring-2 focus:ring-secondary"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-50 text-sm text-gray-800 placeholder:text-gray-400 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             data-testid="mobile-header-search"
           />
         </div>
       </form>
 
-      {/* Row 3: category chips. Live on a cream sub-strip so the maroon
-          header reads as one block and chips look like a shelf attached. */}
-      <div className="bg-background border-t border-primary-dark overflow-x-auto scrollbar-hide" role="navigation" aria-label="Product categories">
+      {/* Row 3: category chips. Soft divider above so chip row reads as a
+          separate shelf attached to the header. */}
+      <div className="border-t border-gray-100 overflow-x-auto scrollbar-hide" role="navigation" aria-label="Product categories">
         <div className="flex items-center gap-2 px-3 py-2 whitespace-nowrap">
           <Link
             to="/products"

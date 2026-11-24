@@ -88,6 +88,7 @@ export default function CartPage() {
   const removeFromCart = async (productId) => {
     try {
       await axios.delete(`${API}/cart/remove/${productId}`, { withCredentials: true });
+      window.dispatchEvent(new Event("cart-updated"));
       toast.success("Item removed from cart");
       fetchCart();
     } catch (error) {
@@ -101,6 +102,7 @@ export default function CartPage() {
     try {
       await axios.delete(`${API}/cart/remove/${productId}`, { withCredentials: true });
       await axios.post(`${API}/cart/add`, { product_id: productId, quantity: newQuantity }, { withCredentials: true });
+      window.dispatchEvent(new Event("cart-updated"));
       fetchCart();
     } catch (error) {
       toast.error("Failed to update quantity");

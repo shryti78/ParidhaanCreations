@@ -157,6 +157,7 @@ export default function ProductDetailPage() {
         cartData.selected_size = activeSize.size;
       }
       await axios.post(`${API}/cart/add`, cartData, { withCredentials: true });
+      window.dispatchEvent(new Event("cart-updated"));
       const label = [activeVariant?.color_name, activeSize?.size].filter(Boolean).join(' - ');
       toast.success(label ? `${label} added to cart!` : "Added to cart!");
     } catch (error) {

@@ -35,6 +35,7 @@ export default function CollectionPage() {
   const addToCart = async (productId) => {
     try {
       await axios.post(`${API}/cart/add`, { product_id: productId, quantity: 1 }, { withCredentials: true });
+      window.dispatchEvent(new Event("cart-updated"));
       toast.success("Added to cart!");
     } catch (error) {
       toast.error("Failed to add to cart");

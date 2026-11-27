@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { API } from "@/App";
-import { 
-  Package, Clock, CheckCircle, XCircle, Truck, MapPin, 
-  Calendar, CreditCard, ShoppingBag, ChevronRight, 
+import {
+  Package, Clock, CheckCircle, XCircle, Truck, MapPin,
+  Calendar, CreditCard, ShoppingBag, ChevronRight,
   RefreshCw, Star, Gift, AlertCircle, Eye
 } from "lucide-react";
+import SEO from "@/components/SEO";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -170,8 +171,9 @@ export default function MyOrdersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 py-8 md:py-12">
+      <SEO title="My Orders" noindex={true} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent" data-testid="orders-title">

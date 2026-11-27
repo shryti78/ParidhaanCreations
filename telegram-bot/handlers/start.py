@@ -81,7 +81,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/cart — view cart\n"
         "/orders — my orders\n"
         "/help — this message\n\n"
-        "Website: https://paridhaancreations.xyz"
+        "Website: https://www.paridhaancreations.xyz"
     )
 
 

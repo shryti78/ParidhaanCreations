@@ -26,7 +26,7 @@ class Settings:
     internal_api_token: str  # shared secret for service-to-service calls
 
     # Public storefront (for deep links back to website)
-    web_base_url: str  # e.g. "https://paridhaancreations.xyz"
+    web_base_url: str  # e.g. "https://www.paridhaancreations.xyz"
 
     # Behaviour
     log_level: str
@@ -52,7 +52,7 @@ def load_settings() -> Settings:
         ).rstrip("/"),
         internal_api_token=_require("INTERNAL_API_TOKEN"),
         web_base_url=os.environ.get(
-            "WEB_BASE_URL", "https://paridhaancreations.xyz"
+            "WEB_BASE_URL", "https://www.paridhaancreations.xyz"
         ).rstrip("/"),
         log_level=os.environ.get("LOG_LEVEL", "INFO").upper(),
         polling_timeout=int(os.environ.get("POLLING_TIMEOUT", "30")),

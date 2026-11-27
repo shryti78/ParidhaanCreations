@@ -237,8 +237,8 @@ _cors_env = os.environ.get('CORS_ORIGINS', '').strip()
 if not _cors_env:
     raise RuntimeError(
         "CORS_ORIGINS env var is required. Set it to a comma-separated list of "
-        "allowed frontend origins (e.g. 'https://paridhaancreations.xyz,"
-        "https://www.paridhaancreations.xyz,http://localhost:3000')."
+        "allowed frontend origins (e.g. 'https://www.paridhaancreations.xyz,"
+        "http://localhost:3000')."
     )
 _allowed_origins = [o.strip() for o in _cors_env.split(',') if o.strip()]
 app.add_middleware(

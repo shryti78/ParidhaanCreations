@@ -90,9 +90,10 @@ export default function TrackingPage() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title={`Track Order ${orderId} | Paridhaan Creations`}
         description="Track your order shipment status"
+        noindex={true}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">

@@ -5,6 +5,7 @@ import { API } from "@/App";
 import { toast } from "sonner";
 import { useRazorpay } from "react-razorpay";
 import { Check, CreditCard, Smartphone, MapPin, Package, ShieldCheck, Truck, Tag, X, ChevronRight } from "lucide-react";
+import SEO from "@/components/SEO";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -396,6 +397,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen py-12 bg-background-paper">
+      <SEO title="Secure Checkout" noindex={true} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-5xl font-heading font-bold mb-12 text-center" data-testid="checkout-title">Secure Checkout</h1>
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import { API } from "@/App";
 import { CheckCircle, Package, MessageCircle } from "lucide-react";
 import { getOrderWhatsAppLink } from "@/components/WhatsAppButton";
+import SEO from "@/components/SEO";
 
 export default function OrderSuccessPage() {
   const [searchParams] = useSearchParams();
@@ -74,6 +75,7 @@ export default function OrderSuccessPage() {
 
   return (
     <div className="min-h-screen py-12">
+      <SEO title="Order Successful" noindex={true} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <CheckCircle className="w-24 h-24 text-green-600 mx-auto mb-6" />

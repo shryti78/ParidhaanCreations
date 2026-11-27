@@ -18,7 +18,25 @@ const SEO = ({
   noindex = false
 }) => {
   const location = useLocation();
-  const url = `${SEO_BASE_URL}${location.pathname}${location.search || ''}`;
+
+  // Build a clean canonical URL. Only a few query params actually change the
+  // page's content (category / subcategory choose which products are shown,
+  // laddu_gopal_size filters the pooja list). Everything else is tracking,
+  // filter/sort state, or pagination — carrying them into the canonical
+  // creates duplicate-looking URLs in Google's index ("Alternate page with
+  // proper canonical tag" warnings) and dilutes link equity.
+  const buildCanonical = () => {
+    const params = new URLSearchParams(location.search || '');
+    const kept = new URLSearchParams();
+    // Content-defining params only. Everything else is stripped.
+    ['category', 'subcategory', 'laddu_gopal_size'].forEach((key) => {
+      const v = params.get(key);
+      if (v) kept.set(key, v);
+    });
+    const qs = kept.toString();
+    return `${SEO_BASE_URL}${location.pathname}${qs ? `?${qs}` : ''}`;
+  };
+  const url = buildCanonical();
 
   useEffect(() => {
     const fullTitle = title.includes(SEO_SITE_NAME) ? title : `${title} | ${SEO_SITE_NAME}`;

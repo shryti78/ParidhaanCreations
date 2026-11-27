@@ -24,8 +24,10 @@ Disallow: /wishlist
 # Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Sitemap location — served by the FastAPI backend on the api.* subdomain
-Sitemap: https://api.paridhaancreations.xyz/api/sitemap.xml
+# Sitemap: served at the canonical domain via a Vercel rewrite that
+# proxies through to the FastAPI backend. Google prefers sitemaps on the
+# same hostname as the property being indexed.
+Sitemap: https://paridhaancreations.xyz/sitemap.xml
 
 # Google specific
 User-agent: Googlebot

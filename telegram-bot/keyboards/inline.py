@@ -54,7 +54,7 @@ def main_menu() -> InlineKeyboardMarkup:
                 InlineKeyboardButton("🛒  My Cart", callback_data=CB_CART_VIEW),
                 InlineKeyboardButton("📦  My Orders", callback_data=CB_ORDERS_LIST),
             ],
-            [InlineKeyboardButton("💬  Help", url="https://paridhaancreations.xyz/support")],
+            [InlineKeyboardButton("💬  Help", url="https://www.paridhaancreations.xyz/support")],
         ]
     )
 

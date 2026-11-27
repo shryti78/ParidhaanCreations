@@ -244,7 +244,7 @@ async def _notify_telegram_order_confirmed(order: dict) -> None:
             "as it ships. Thank you for shopping with Paridhaan Creations 🙏"
         )
 
-        website_order_url = f"https://paridhaancreations.xyz/order-success?order_id={order.get('order_id')}"
+        website_order_url = f"https://www.paridhaancreations.xyz/order-success?order_id={order.get('order_id')}"
         reply_markup = inline_url_button("🌐 View on Website", website_order_url)
 
         await send_telegram_message(

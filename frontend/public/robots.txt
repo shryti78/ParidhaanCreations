@@ -1,5 +1,5 @@
 # Robots.txt for Paridhaan Creations
-# https://paridhaancreations.xyz
+# https://www.paridhaancreations.xyz
 
 User-agent: *
 Allow: /

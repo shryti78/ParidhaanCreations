@@ -260,7 +260,7 @@ async def assign_courier(
         
         label_response = await ShiprocketService.generate_label(shipment["shiprocket_shipment_id"])
         
-        site_url = os.environ.get("SITE_URL", "https://paridhaancreations.xyz")
+        site_url = os.environ.get("SITE_URL", "https://www.paridhaancreations.xyz")
         tracking_url = f"{site_url}/track/{order_id}"
         
         update_data = {

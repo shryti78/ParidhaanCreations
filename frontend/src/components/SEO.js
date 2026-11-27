@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const SEO_SITE_NAME = "Paridhaan Creations";
-const SEO_BASE_URL = "https://paridhaancreations.xyz";
+const SEO_BASE_URL = "https://www.paridhaancreations.xyz";
 const SEO_DEFAULT_IMAGE = "/logo-header.png";
 
 const SEO = ({ 

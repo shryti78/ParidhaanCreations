@@ -11,7 +11,7 @@ def init_router(db):
     global _db
     _db = db
 
-BASE_URL = "https://paridhaancreations.xyz"
+BASE_URL = "https://www.paridhaancreations.xyz"
 
 @router.get("/sitemap.xml", response_class=Response)
 async def sitemap_xml():
